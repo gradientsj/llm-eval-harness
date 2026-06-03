@@ -1,5 +1,7 @@
 # llm-eval-harness
 
+[![eval-gate](https://github.com/gradientsj/llm-eval-harness/actions/workflows/eval-gate.yml/badge.svg)](https://github.com/gradientsj/llm-eval-harness/actions/workflows/eval-gate.yml)
+
 **An LLM-as-judge evaluation harness with human calibration and two-tier CI
 quality gating, demonstrated on grounded QA.**
 
