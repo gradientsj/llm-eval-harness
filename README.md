@@ -147,7 +147,7 @@ Labels follow the rubric mechanically (`overall_pass` ⇔ groundedness ≥ 4 ∧
 relevance ≥ 3 ∧ coherence ≥ 3), which is itself enforced by a unit test — the
 dataset cannot drift from its own labeling rule without CI noticing.
 
-**Provenance, honestly:** this is a seed benchmark labeled by a single
+**Provenance:** this is a seed benchmark labeled by a single
 annotator (me) to demonstrate the calibration machinery. The production
 version needs ≥3 annotators per example with inter-annotator agreement
 reported, examples sampled from real traffic, and a held-out split so the
@@ -184,7 +184,7 @@ In rough priority order:
    single flipped example moves κ by ~0.07, and the gates should know that.
 3. **Judge robustness checks** — position/length bias probes, self-consistency
    across temperature-0 re-runs over time, and an ensemble-of-rubrics variant.
-4. **Scale annotation honestly** — multi-annotator labels with Krippendorff's
+4. **Scale the annotation** — multi-annotator labels with Krippendorff's
    α, adjudication, and a held-out certification split.
 5. **Close the loop on a real system** — point the harness at an actual
    RAG/agent pipeline so the regression gate scores live candidate outputs per
