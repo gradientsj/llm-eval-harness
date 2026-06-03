@@ -1,0 +1,10 @@
+{
+  "backend": "mock",
+  "dataset": "data/grounded_qa.jsonl",
+  "aggregate": {
+    "pass_rate": 0.6,
+    "mean_groundedness": 3.7333333333333334,
+    "mean_relevance": 3.8666666666666667,
+    "mean_coherence": 4.866666666666666
+  }
+}

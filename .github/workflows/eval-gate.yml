@@ -1,0 +1,43 @@
+name: eval-gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: uv sync --extra dev
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Unit tests
+        run: uv run pytest
+
+      # Tier 1 - calibration gate: fail if the judge no longer agrees with
+      # human labels above threshold. A drifted judge must not gate releases.
+      - name: Calibration gate (judge vs. human agreement)
+        run: uv run evalharness calibrate --backend mock --check-gates
+
+      # Tier 2 - regression gate: fail if aggregate quality of the candidate
+      # answers drops below the frozen baseline tolerance.
+      - name: Regression gate (quality vs. frozen baseline)
+        run: uv run evalharness gate --backend mock
+
+      - name: Upload calibration report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calibration-report
+          path: reports/
