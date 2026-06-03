@@ -53,9 +53,10 @@ def _load_dotenv() -> None:
 def _add_common(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--backend",
-        choices=["mock", "anthropic"],
-        default="mock",
-        help="judge backend (default: mock - deterministic, no credentials)",
+        choices=["lexical", "anthropic"],
+        default="lexical",
+        help="judge backend (default: lexical - deterministic word-overlap "
+        "baseline, no credentials needed)",
     )
 
 
@@ -63,7 +64,7 @@ def cmd_calibrate(args: argparse.Namespace) -> int:
     examples = load_dataset(args.dataset)
     judge = Judge(create_backend(args.backend))
     print(f"Calibrating {args.backend} judge on {len(examples)} labeled examples...")
-    result = run_calibration(examples, judge, progress=args.backend != "mock")
+    result = run_calibration(examples, judge, progress=args.backend != "lexical")
 
     gate_report = check_calibration_gate(result)
     out_path = Path(args.out or f"reports/calibration_report_{args.backend}.md")
@@ -93,7 +94,7 @@ def cmd_baseline(args: argparse.Namespace) -> int:
     examples = load_dataset(args.dataset)
     judge = Judge(create_backend(args.backend))
     print(f"Scoring {len(examples)} examples with {args.backend} judge for baseline...")
-    scores = judge.score_dataset(examples, progress=args.backend != "mock")
+    scores = judge.score_dataset(examples, progress=args.backend != "lexical")
     aggregate = aggregate_scores(scores)
     write_baseline(args.out, args.backend, args.dataset, aggregate)
     print(f"Baseline written to {args.out}: "
@@ -105,7 +106,7 @@ def cmd_gate(args: argparse.Namespace) -> int:
     examples = load_dataset(args.candidates)
     judge = Judge(create_backend(args.backend))
     print(f"Scoring {len(examples)} candidate answers with {args.backend} judge...")
-    scores = judge.score_dataset(examples, progress=args.backend != "mock")
+    scores = judge.score_dataset(examples, progress=args.backend != "lexical")
     current = aggregate_scores(scores)
 
     baseline = load_baseline(args.baseline)

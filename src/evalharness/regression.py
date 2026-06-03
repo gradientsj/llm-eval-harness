@@ -28,7 +28,7 @@ from .rubric import DIMENSIONS
 @dataclass(frozen=True)
 class GateConfig:
     # Tier 1: minimum acceptable judge-human agreement. Initialized just below
-    # the measured agreement of the lexical mock baseline (kappa 0.400,
+    # the measured agreement of the lexical baseline (kappa 0.400,
     # groundedness QWK 0.256 on the seed benchmark) so the floor is honest:
     # any judge that cannot beat lexical overlap fails. After switching to a
     # stronger judge backend, ratchet these up to just below its measured

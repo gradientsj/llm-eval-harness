@@ -25,10 +25,11 @@ Three design commitments, all unusual enough to be worth stating up front:
    computed on a labeled benchmark and enforced in CI: if a prompt or model
    change degrades agreement below threshold, the build fails. A judge you
    can't trust must not gate releases.
-2. **A deterministic lexical judge is the control arm.** The `mock` backend
-   scores groundedness by content-word overlap — the strongest thing you can
-   do without a model. It runs the entire pipeline in CI with zero secrets,
-   and it sets the floor an LLM judge has to beat to justify its cost.
+2. **A deterministic lexical judge is the control arm.** The `lexical`
+   backend scores groundedness by content-word overlap — the strongest thing
+   you can do without a model. It runs the entire pipeline in CI with zero
+   secrets, and it sets the floor an LLM judge has to beat to justify its
+   cost.
 3. **The benchmark is adversarially composed.** A third of the examples are
    constructed traps — negation flips, fact recombinations, correct refusals,
    incoherent-but-on-topic strings — where shallow scoring is known to
@@ -37,8 +38,8 @@ Three design commitments, all unusual enough to be worth stating up front:
 
 ## Results: the lexical baseline, measured
 
-Judge↔human agreement of the `mock` (lexical-overlap) judge on the 30-example
-seed benchmark (`uv run evalharness calibrate --backend mock`):
+Judge↔human agreement of the `lexical` (word-overlap) baseline judge on the
+30-example seed benchmark (`uv run evalharness calibrate --backend lexical`):
 
 | Dimension | QWK | Spearman | MAE | Exact | Within ±1 |
 |---|---|---|---|---|---|
@@ -50,7 +51,7 @@ Ship/no-ship (overall_pass): **accuracy 0.70, Cohen's κ 0.400, F1 0.73.**
 
 The gradient is the finding: **coherence is nearly solvable with surface
 features, relevance is partially solvable, groundedness is not.** The
-[failure analysis](reports/calibration_report_mock.md) shows the three
+[failure analysis](reports/calibration_report_lexical.md) shows the three
 mechanisms, each a deliberate slice of the benchmark:
 
 - **Negation flips** (`gqa-018`: human 1, judge 5) — *"Yes, his gritty trough
@@ -71,14 +72,14 @@ and cost — and the harness is how you check it does.
 ## Quickstart
 
 Requires [uv](https://docs.astral.sh/uv/). No API key needed for the default
-mock backend.
+lexical backend.
 
 ```bash
 uv sync --extra dev
 uv run pytest                                          # 45 tests
-uv run evalharness calibrate --backend mock --check-gates
-uv run evalharness baseline  --backend mock            # freeze the baseline
-uv run evalharness gate      --backend mock            # regression-gate it
+uv run evalharness calibrate --backend lexical --check-gates
+uv run evalharness baseline  --backend lexical            # freeze the baseline
+uv run evalharness gate      --backend lexical            # regression-gate it
 ```
 
 To run the real judge, set `ANTHROPIC_API_KEY` (copy `.env.example` to `.env`),
@@ -115,7 +116,7 @@ questions with 8 answers replaced by fluent fabrications — to demonstrate the
 gate catching a real quality drop:
 
 ```
-$ uv run evalharness gate --backend mock --candidates data/grounded_qa_regressed.jsonl
+$ uv run evalharness gate --backend lexical --candidates data/grounded_qa_regressed.jsonl
   [FAIL] pass rate: baseline 0.600, current 0.333, allowed drop 0.020
   [FAIL] mean groundedness: baseline 3.733, current 2.767, allowed drop 0.150
 Regression gate FAILED - candidate quality dropped below baseline tolerance.   (exit 1)
@@ -169,8 +170,8 @@ limitations.
   code fences and surrounding prose are tolerated, with one terse retry —
   matching how real models actually misbehave.
 - **Backend mismatch is a hard error.** Scores from different judges are not
-  comparable; the regression gate refuses to compare a `mock` run against an
-  `anthropic` baseline rather than emitting a meaningless verdict.
+  comparable; the regression gate refuses to compare a `lexical` run against
+  an `anthropic` baseline rather than emitting a meaningless verdict.
 
 ## What I'd do next
 
@@ -197,7 +198,7 @@ src/evalharness/
   dataset.py              # JSONL loading + validation; labels optional for gating
   judge.py                # prompt rendering, strict parsing, one-retry scoring
   backends/
-    mock.py               # deterministic lexical judge (CI control arm)
+    lexical.py            # deterministic word-overlap judge (CI control arm)
     anthropic_backend.py  # temperature-0 Anthropic judge, pinned model
   metrics.py              # κ, QWK, Spearman/Pearson, MAE, confusion — pure Python
   calibration.py          # agreement computation + ranked disagreements
@@ -210,7 +211,7 @@ data/
   baseline_scores.json         # frozen aggregates (regression-gate reference)
   ANNOTATION_GUIDELINES.md     # human labeling instructions (same rubric)
 reports/
-  calibration_report_mock.md   # committed example output, reproducible in CI
+  calibration_report_lexical.md  # committed example output, reproducible in CI
 tests/                         # 45 tests: metrics math, parsing, E2E, gates
 ```
 

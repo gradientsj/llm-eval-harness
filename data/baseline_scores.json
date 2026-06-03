@@ -1,5 +1,5 @@
 {
-  "backend": "mock",
+  "backend": "lexical",
   "dataset": "data/grounded_qa.jsonl",
   "aggregate": {
     "pass_rate": 0.6,

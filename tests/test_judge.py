@@ -96,9 +96,9 @@ def test_render_request_includes_fields_and_rubric():
 
 
 def test_mock_backend_deterministic_and_directionally_sane():
-    from evalharness.backends import MockBackend
+    from evalharness.backends import LexicalBackend
 
-    backend = MockBackend()
+    backend = LexicalBackend()
     request = render_request(EXAMPLE)
     assert backend.complete(request) == backend.complete(request)
 
@@ -121,7 +121,7 @@ def test_mock_backend_is_blind_to_negation():
     """Documents the designed failure mode: a negation flip built from context
     vocabulary gets high lexical groundedness. The calibration report exists
     to quantify exactly this."""
-    from evalharness.backends import MockBackend
+    from evalharness.backends import LexicalBackend
 
     flipped = Example(
         id="t-3",
@@ -133,5 +133,5 @@ def test_mock_backend_is_blind_to_negation():
         human_rationale="",
         tags=(),
     )
-    verdict = json.loads(MockBackend().complete(render_request(flipped)))
+    verdict = json.loads(LexicalBackend().complete(render_request(flipped)))
     assert verdict["groundedness"] >= 4

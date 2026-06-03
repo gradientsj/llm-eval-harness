@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from evalharness.backends import MockBackend
+from evalharness.backends import LexicalBackend
 from evalharness.calibration import compute_calibration, run_calibration
 from evalharness.dataset import load_dataset
 from evalharness.judge import Judge, JudgeScore
@@ -47,17 +47,18 @@ def test_perfect_judge_scores_perfect_agreement(examples):
 
 
 def test_mock_judge_end_to_end(examples):
-    result = run_calibration(examples, Judge(MockBackend()))
+    result = run_calibration(examples, Judge(LexicalBackend()))
     assert result.n_examples == 30
     assert set(result.ordinal) == {"groundedness", "relevance", "coherence"}
-    # The mock is designed to be imperfect: traps must produce disagreements.
+    # The lexical baseline is designed to be imperfect: traps must produce
+    # disagreements.
     assert result.disagreements
     # Confusion matrix cells must sum to n.
     assert sum(sum(row) for row in result.overall_pass.confusion) == 30
 
 
 def test_disagreements_ranked_worst_first(examples):
-    result = run_calibration(examples, Judge(MockBackend()))
+    result = run_calibration(examples, Judge(LexicalBackend()))
     deltas = [abs(d.delta) for d in result.disagreements]
     assert deltas == sorted(deltas, reverse=True)
 

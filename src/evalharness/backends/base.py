@@ -1,8 +1,9 @@
 """Backend interface for the judge.
 
 A backend receives the fully rendered prompts plus the structured fields they
-were rendered from. Real LLM backends use the prompts; the deterministic mock
-uses the structured fields directly so it never has to parse prompt text.
+were rendered from. Real LLM backends use the prompts; the deterministic
+lexical baseline uses the structured fields directly so it never has to parse
+prompt text.
 """
 
 from __future__ import annotations

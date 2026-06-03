@@ -28,12 +28,12 @@ jobs:
       # Tier 1 - calibration gate: fail if the judge no longer agrees with
       # human labels above threshold. A drifted judge must not gate releases.
       - name: Calibration gate (judge vs. human agreement)
-        run: uv run evalharness calibrate --backend mock --check-gates
+        run: uv run evalharness calibrate --backend lexical --check-gates
 
       # Tier 2 - regression gate: fail if aggregate quality of the candidate
       # answers drops below the frozen baseline tolerance.
       - name: Regression gate (quality vs. frozen baseline)
-        run: uv run evalharness gate --backend mock
+        run: uv run evalharness gate --backend lexical
 
       - name: Upload calibration report
         if: always()

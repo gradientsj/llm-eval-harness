@@ -68,7 +68,7 @@ def test_calibration_gate_fails_on_nan():
 def test_baseline_round_trip(tmp_path):
     path = tmp_path / "baseline.json"
     agg = {"pass_rate": 0.6, "mean_groundedness": 3.9}
-    write_baseline(path, "mock", "data/grounded_qa.jsonl", agg)
+    write_baseline(path, "lexical", "data/grounded_qa.jsonl", agg)
     loaded = load_baseline(path)
-    assert loaded["backend"] == "mock"
+    assert loaded["backend"] == "lexical"
     assert loaded["aggregate"] == agg

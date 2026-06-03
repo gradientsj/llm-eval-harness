@@ -1,9 +1,8 @@
-"""Deterministic lexical-overlap judge.
+"""Deterministic lexical-overlap judge: the no-model baseline.
 
-This is intentionally a *weak but honest* baseline judge: it scores
-groundedness by content-word overlap between answer and context, and
-relevance by overlap between question and answer. It exists for three
-reasons:
+This judge grades with word counting, not a model. It scores groundedness by
+content-word overlap between answer and context, and relevance by overlap
+between question and answer. It exists for three reasons:
 
 1. CI and tests run the full pipeline (prompt -> backend -> JSON -> parse ->
    metrics) with zero secrets and full determinism.
@@ -60,8 +59,8 @@ def _bucket(value: float, thresholds: tuple[float, float, float, float]) -> int:
     return 1
 
 
-class MockBackend:
-    name = "mock"
+class LexicalBackend:
+    name = "lexical"
 
     def complete(self, request: JudgeRequest) -> str:
         answer_words = _content_words(request.answer)

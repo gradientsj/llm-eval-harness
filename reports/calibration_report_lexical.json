@@ -1,5 +1,5 @@
 {
-  "backend": "mock",
+  "backend": "lexical",
   "n_examples": 30,
   "ordinal": {
     "groundedness": {
